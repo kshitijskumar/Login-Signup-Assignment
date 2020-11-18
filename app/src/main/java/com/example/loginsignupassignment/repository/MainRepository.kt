@@ -2,7 +2,9 @@ package com.example.loginsignupassignment.repository
 
 import android.util.Log
 import com.example.loginsignupassignment.model.ExistingUser
+import com.example.loginsignupassignment.model.LoginResponseModel
 import com.example.loginsignupassignment.model.NewUser
+import com.example.loginsignupassignment.model.SignUpResponseModel
 import com.example.loginsignupassignment.retrofit.RetrofitInterface
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
@@ -14,6 +16,9 @@ import javax.inject.Inject
 class MainRepository @Inject constructor(
     private val retrofitInterface: RetrofitInterface
 ) {
+
+    private var loggedInUserDetail = LoginResponseModel("", "", "", "", "", "", "", "")
+    private var signedUpUserToken = SignUpResponseModel("")
 
     suspend fun signUpNewUserInRepo(newUser: NewUser) = flow{
         withContext(Dispatchers.IO){
@@ -41,7 +46,14 @@ class MainRepository @Inject constructor(
 //                }
 
                 when(response.code()){
-                    201 -> emit("SignUp successful")
+                    201 -> {
+                        response.body()?.let {
+                            signedUpUserToken = it.copy()
+                        }
+
+                        emit("SignUp successful")
+                        Log.d("MainRepo", "Signup token is ${response.body()?.token}")
+                    }
                     409 -> emit("Email already taken")
                     else -> emit("Something went wrong")
                 }
@@ -54,14 +66,19 @@ class MainRepository @Inject constructor(
     }
 
     suspend fun loginUserInRepo(existingUser: ExistingUser) = flow{
-        Log.d("MainRepo", "Login user thread is ${Thread.currentThread().name}")
             try {
                 val response = retrofitInterface.loginUser(existingUser.email,
                                                                                         existingUser.password)
 
                 when(response.code()){
-                    201 -> emit("Login successful")
-                    401 -> emit("Invalid email or password")
+                    201 -> {
+                        response.body()?.let {
+                            loggedInUserDetail = it.copy()
+                        }
+
+                        emit("Login successful")
+                    }
+                    409 -> emit("Invalid email or password")
                     else -> emit("Something went wrong")
                 }
             }catch (e: Exception){
@@ -71,4 +88,8 @@ class MainRepository @Inject constructor(
     }.catch {
         emit("Something went wrong")
     }
+
+    fun showLoggedInUser() = loggedInUserDetail
+
+    fun showSignedUpUser() = signedUpUserToken
 }

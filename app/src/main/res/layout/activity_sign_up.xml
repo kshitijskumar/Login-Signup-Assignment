@@ -48,7 +48,7 @@
         android:layout_marginTop="15dp"
         android:ems="10"
         android:hint="Password"
-        android:inputType="textPersonName|textPassword"
+        android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="@+id/etEmailSignUp"
         app:layout_constraintStart_toStartOf="@+id/etEmailSignUp"
         app:layout_constraintTop_toBottomOf="@+id/etEmailSignUp" />

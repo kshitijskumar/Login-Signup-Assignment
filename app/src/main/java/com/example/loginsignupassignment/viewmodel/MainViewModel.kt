@@ -25,10 +25,15 @@ class MainViewModel @ViewModelInject constructor(
     val loginStatus: LiveData<String>
     get() = _loginStatus
 
+
     fun signUpNewUserInViewModel(newUser: NewUser)= viewModelScope
         .launch(Dispatchers.IO){
         repository.signUpNewUserInRepo(newUser).collect {
             Log.d("MainViewModel", "Collected string is $it")
+            if (it == "SignUp successful"){
+                val user = repository.showSignedUpUser()
+                Log.d("MainViewModel", "SignedUp user is $user")
+            }
             _signUpStatus.postValue(it)
         }
     }
@@ -37,7 +42,12 @@ class MainViewModel @ViewModelInject constructor(
         .launch(Dispatchers.IO) {
             repository.loginUserInRepo(existingUser).collect {
                 Log.d("MainViewModel", "Collected string is $it")
+                if (it == "Login successful"){
+                    val user = repository.showLoggedInUser()
+                    Log.d("MainViewModel", "Logged in user is $user")
+                }
                 _loginStatus.postValue(it)
+
             }
         }
 

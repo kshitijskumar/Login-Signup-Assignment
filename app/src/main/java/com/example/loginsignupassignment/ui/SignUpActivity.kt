@@ -53,6 +53,7 @@ class SignUpActivity : AppCompatActivity() {
                     Toast.makeText(this, "SignUp successful", Toast.LENGTH_SHORT).show()
                     val intent = Intent(this, LoggedInActivity::class.java)
                     startActivity(intent)
+                    finish()
                 }
                 "Email already taken" -> {
                     hideLoading()
