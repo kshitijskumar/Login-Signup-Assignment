@@ -6,11 +6,8 @@ import com.example.loginsignupassignment.model.LoginResponseModel
 import com.example.loginsignupassignment.model.NewUser
 import com.example.loginsignupassignment.model.SignUpResponseModel
 import com.example.loginsignupassignment.retrofit.RetrofitInterface
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
-import java.lang.Exception
 import javax.inject.Inject
 
 class MainRepository @Inject constructor(
@@ -21,14 +18,13 @@ class MainRepository @Inject constructor(
     private var signedUpUserToken = SignUpResponseModel("")
 
     suspend fun signUpNewUserInRepo(newUser: NewUser) = flow{
-        withContext(Dispatchers.IO){
-            try {
-                val response = retrofitInterface.signUpNewUser(newUser.name,
-                                                                                            newUser.phone,
-                                                                                            newUser.email,
-                                                                                            newUser.password,
-                                                                                            newUser.country,
-                                                                                            newUser.city)
+
+        val response = retrofitInterface.signUpNewUser(newUser.name,
+                newUser.phone,
+                newUser.email,
+                newUser.password,
+                newUser.country,
+                newUser.city)
 
 //                if (response.isSuccessful){
 //                    Log.d("MainRepo", "The token is ${response.body()?.token}")
@@ -45,45 +41,38 @@ class MainRepository @Inject constructor(
 //                    emit("Email already taken")
 //                }
 
-                when(response.code()){
-                    201 -> {
-                        response.body()?.let {
-                            signedUpUserToken = it.copy()
-                        }
-
-                        emit("SignUp successful")
-                        Log.d("MainRepo", "Signup token is ${response.body()?.token}")
-                    }
-                    409 -> emit("Email already taken")
-                    else -> emit("Something went wrong")
+        when(response.code()){
+            201 -> {
+                response.body()?.let {
+                    signedUpUserToken = it.copy()
                 }
-            }catch (e: Exception){
-                Log.d("MainRepoCatch", "The error is ${e.message}")
+
+                emit("SignUp successful")
+                Log.d("MainRepo", "Signup token is ${response.body()?.token}")
             }
+            409 -> emit("Email already taken")
+            else -> emit("Something went wrong")
         }
+
     }.catch {
         emit("Something went wrong")
     }
 
     suspend fun loginUserInRepo(existingUser: ExistingUser) = flow{
-            try {
-                val response = retrofitInterface.loginUser(existingUser.email,
-                                                                                        existingUser.password)
 
-                when(response.code()){
-                    201 -> {
-                        response.body()?.let {
-                            loggedInUserDetail = it.copy()
-                        }
-
-                        emit("Login successful")
-                    }
-                    409 -> emit("Invalid email or password")
-                    else -> emit("Something went wrong")
+        val response = retrofitInterface.loginUser(existingUser.email,
+                existingUser.password)
+        when(response.code()){
+            201 -> {
+                response.body()?.let {
+                    loggedInUserDetail = it.copy()
                 }
-            }catch (e: Exception){
-                Log.d("MainRepoCatch", "Login user error message is ${e.message}")
+
+                emit("Login successful")
             }
+            409 -> emit("Invalid email or password")
+            else -> emit("Something went wrong")
+        }
 
     }.catch {
         emit("Something went wrong")

@@ -12,6 +12,7 @@ import com.example.loginsignupassignment.repository.MainRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 
 class MainViewModel @ViewModelInject constructor(
     private val repository: MainRepository
