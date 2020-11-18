@@ -71,6 +71,7 @@ class MainRepository @Inject constructor(
                 emit("Login successful")
             }
             409 -> emit("Invalid email or password")
+            404 -> emit("User not found")
             else -> emit("Something went wrong")
         }
 

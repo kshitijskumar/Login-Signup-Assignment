@@ -59,6 +59,10 @@ class MainActivity : AppCompatActivity() {
                     hideLoading()
                     Toast.makeText(this, "Something went wrong", Toast.LENGTH_SHORT).show()
                 }
+                "User not found" -> {
+                    hideLoading()
+                    Toast.makeText(this, "User not found", Toast.LENGTH_SHORT).show()
+                }
             }
         })
     }
